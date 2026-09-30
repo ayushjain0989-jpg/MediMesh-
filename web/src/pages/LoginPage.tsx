@@ -39,7 +39,9 @@ export function LoginPage() {
     e.preventDefault()
     setBusy(true)
     setError('')
-    const remote = await loginRemote(role, loginId, password)
+    const id = loginId.trim()
+    const pass = password.trim()
+    const remote = await loginRemote(role, id, pass)
     if (remote.ok) {
       const who = state.people.find((p) => p.id === remote.user.id)
       setBusy(false)
@@ -51,12 +53,7 @@ export function LoginPage() {
       navigate('/app')
       return
     }
-    if (!remote.network) {
-      setBusy(false)
-      setError(remote.error)
-      return
-    }
-    const local = authenticate(state.people, role, loginId, password)
+    const local = authenticate(state.people, role, id, pass)
     setBusy(false)
     if (!local.ok) {
       setError(local.error)

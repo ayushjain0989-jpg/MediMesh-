@@ -22,7 +22,7 @@ body,
 
 body {
   margin: 0;
-  background: #cfe8e4;
+  background: #f3faf8;
   color: var(--color-ink);
   font-family: var(--font-sans);
 }

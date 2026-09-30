@@ -205,6 +205,68 @@ export type Appointment = {
   ticketId?: string
 }
 
+export type CoverStatus = 'draft' | 'submitted' | 'pre-auth' | 'approved' | 'rejected' | 'paid'
+export type CoverAppStatus = 'applied' | 'offered' | 'issued' | 'declined'
+
+export type CoverOffer = {
+  id: string
+  hospitalId: string
+  provider: string
+  planName: string
+  promise: string
+  cashless: boolean
+  coveragePercent: number
+  sumInsured: number
+  premiumYear: number
+  waitingDays: number
+  minAge: number
+  maxAge: number
+  kind: 'fresh' | 'top-up'
+}
+
+export type CoverApplication = {
+  id: string
+  hospitalId: string
+  patientId: string
+  offerId: string
+  nominee: string
+  relation: string
+  declaredCondition: string
+  status: CoverAppStatus
+  appliedAt: string
+  note?: string
+  policyId?: string
+}
+
+export type CoverPolicy = {
+  id: string
+  hospitalId: string
+  patientId: string
+  policyNumber: string
+  provider: string
+  planName: string
+  cashless: boolean
+  coveragePercent: number
+  sumInsured: number
+  premium: number
+  validFrom: string
+  validTill: string
+  waitingDays: number
+  networkHospital: boolean
+}
+
+export type CoverClaim = {
+  id: string
+  hospitalId: string
+  patientId: string
+  policyId: string
+  reference: string
+  status: CoverStatus
+  visitLabel: string
+  doctorName: string
+  checkNote?: string
+}
+
 export type TimelineItem = {
   id: string
   patientId: string
@@ -245,6 +307,10 @@ export type MeshState = {
   appointments: Appointment[]
   timeline: TimelineItem[]
   copilotRules: CopilotRule[]
+  coverOffers: CoverOffer[]
+  coverApps: CoverApplication[]
+  policies: CoverPolicy[]
+  claims: CoverClaim[]
 }
 
 export type MeshAction =
@@ -270,3 +336,13 @@ export type MeshAction =
       issueToken: boolean
       department: string
     }
+  | {
+      type: 'apply-cover'
+      hospitalId: string
+      patientId: string
+      offerId: string
+      nominee: string
+      relation: string
+    }
+  | { type: 'decide-cover'; applicationId: string; status: CoverAppStatus; note: string }
+  | { type: 'request-cashless'; patientId: string }

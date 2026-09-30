@@ -1,32 +1,19 @@
-# React + TypeScript + Vite
+# MediMesh AI
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Explainable multi-hospital OPD portal. Wait times come from a named formula. Care Copilot is IF–THEN, not ChatGPT. Cover desk is apply/offer at this hospital.
 
-Currently, two official plugins are available:
+Live: https://web-ten-drab-cljuc58g0u.vercel.app
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Demo
 
-## React Compiler
+Password: `mesh123` · Patient `PT-SUN-101` · Doctor `DR-SUN-201` · Admin `AD-SUN-601`
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tests
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm test
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+HospitalFlow: consult = waiting × minutes ÷ doctors, then pharmacy, stock-out, handover 1.12, crowd. Python FastAPI uses the same numbers (`../analytics`).
+
+Vercel build runs tests before `vite build`.

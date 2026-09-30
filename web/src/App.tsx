@@ -13,6 +13,7 @@ import { ReportsPage } from './pages/ReportsPage'
 import { RxPage } from './pages/RxPage'
 import { AiPage } from './pages/AiPage'
 import { DatabasePage } from './pages/DatabasePage'
+import { InsurancePage } from './pages/InsurancePage'
 import { Workspace } from './pages/Workspace'
 
 export default function App() {
@@ -37,6 +38,7 @@ export default function App() {
           <Route path="profile" element={<ProfilePage />} />
           <Route path="ai" element={<AiPage />} />
           <Route path="database" element={<DatabasePage />} />
+          <Route path="insurance" element={<InsurancePage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

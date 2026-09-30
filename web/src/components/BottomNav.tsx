@@ -21,12 +21,15 @@ const tabs: Record<Role, Tab[]> = {
     { to: '/app', label: 'Home', icon: IconHome, end: true },
     { to: '/app/book', label: 'Appointments', icon: IconCal },
     { to: '/app/health', label: 'Reports', icon: IconHeart },
+    { to: '/app/insurance', label: 'Cover', icon: IconCheck },
+    { to: '/app/ai', label: 'Copilot', icon: IconSpark },
     { to: '/app/profile', label: 'Profile', icon: IconUser },
   ],
   doctor: [
     { to: '/app', label: 'Home', icon: IconHome, end: true },
     { to: '/app/patients', label: 'Patients', icon: IconUsers },
     { to: '/app/reports', label: 'Reports', icon: IconChart },
+    { to: '/app/ai', label: 'Copilot', icon: IconSpark },
     { to: '/app/profile', label: 'Profile', icon: IconUser },
   ],
   nurse: [
@@ -51,34 +54,32 @@ const tabs: Record<Role, Tab[]> = {
     { to: '/app', label: 'Home', icon: IconHome, end: true },
     { to: '/app/flow', label: 'AI', icon: IconSpark },
     { to: '/app/hospitals', label: 'Hospitals', icon: IconBuilding },
+    { to: '/app/database', label: 'Database', icon: IconList },
     { to: '/app/profile', label: 'Profile', icon: IconUser },
   ],
 }
 
-export function BottomNav({ role }: { role: Role }) {
+export function AppNav({ role }: { role: Role }) {
   return (
-    <nav className="absolute inset-x-0 bottom-0 z-10 border-t border-line bg-white/95 pb-3 pt-1 backdrop-blur">
-      <ul className="grid grid-cols-4">
-        {tabs[role].map((tab) => {
-          const Icon = tab.icon
-          return (
-            <li key={tab.to}>
-              <NavLink
-                to={tab.to}
-                end={tab.end}
-                className={({ isActive }) =>
-                  `flex flex-col items-center gap-0.5 py-2 text-[10px] font-semibold ${
-                    isActive ? 'text-brand' : 'text-muted'
-                  }`
-                }
-              >
-                <Icon className="h-5 w-5" />
-                {tab.label}
-              </NavLink>
-            </li>
-          )
-        })}
-      </ul>
+    <nav className="flex flex-1 flex-wrap items-center justify-center gap-1 text-sm font-semibold text-muted">
+      {tabs[role].map((tab) => {
+        const Icon = tab.icon
+        return (
+          <NavLink
+            key={tab.to}
+            to={tab.to}
+            end={tab.end}
+            className={({ isActive }) =>
+              `flex items-center gap-1.5 rounded-full px-3 py-1.5 ${
+                isActive ? 'bg-brand text-white' : 'hover:text-ink'
+              }`
+            }
+          >
+            <Icon className="h-4 w-4" />
+            {tab.label}
+          </NavLink>
+        )
+      })}
     </nav>
   )
 }

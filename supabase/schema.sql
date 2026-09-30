@@ -92,3 +92,25 @@ insert into copilot_rules (id, if_keywords, then_specialty, then_urgency, then_a
   ('R3', 'fever|child', 'General Physician', 'routine', 'General / paeds OPD. Fluids and paracetamol.', false),
   ('R4', 'knee|bone|joint|fracture', 'Orthopedics', 'routine', 'Orthopedics. X-ray today if the limb looks wrong.', false)
 on conflict (id) do nothing;
+
+-- Cover desk: hospital offers a plan, patient applies. Not a billed claim form.
+create table if not exists cover_offers (
+  id text primary key,
+  hospital_id text not null references hospitals(id),
+  provider text not null,
+  plan_name text not null,
+  promise text not null,
+  kind text not null check (kind in ('fresh','top-up')),
+  waiting_days int not null
+);
+
+create table if not exists cover_applications (
+  id text primary key,
+  hospital_id text not null references hospitals(id),
+  patient_id text not null,
+  offer_id text not null references cover_offers(id),
+  nominee text not null,
+  relation text not null,
+  status text not null,
+  declared_condition text
+);

@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
 import { Avatar, Card, IconBack } from '../components/ui'
-import { scoped } from '../lib/selectors'
+import { downloadMedicalReportPdf } from '../lib/reportPdf'
+import { hospitalOf, scoped } from '../lib/selectors'
 import { useMesh } from '../state/MeshContext'
 
 export function PatientsListPage() {
@@ -36,9 +37,12 @@ export function PatientRecord() {
   const { id } = useParams()
   const { state, session, dispatch, person } = useMesh()
   if (!session) return null
+  const hospital = hospitalOf(state, session.hospitalId)
   const p = state.patients.find((x) => x.id === id)
   if (!p) return <p className="p-5">Patient not found.</p>
   const ticket = state.queue.find((q) => q.patientId === p.id && q.status === 'with-doctor')
+  const notes = state.timeline.filter((t) => t.patientId === p.id)
+  const rx = state.prescriptions.filter((r) => r.patientId === p.id)
   return (
     <div className="space-y-4 px-5 pt-2">
       <Link to="/app/patients" className="flex items-center gap-1 text-sm font-semibold text-brand">
@@ -65,6 +69,13 @@ export function PatientRecord() {
         <p className="text-sm">• Allergy: {p.allergies}</p>
         <p className="text-sm">• Previous surgeries: {p.surgeries}</p>
       </Card>
+      <button
+        type="button"
+        className="w-full rounded-2xl bg-brand py-3 text-sm font-bold text-white"
+        onClick={() => downloadMedicalReportPdf({ hospital, patient: p, notes, prescriptions: rx })}
+      >
+        Download medical report PDF
+      </button>
       <div>
         <p className="mb-2 text-xs font-bold text-muted">Recent Vitals</p>
         <div className="grid grid-cols-3 gap-2">

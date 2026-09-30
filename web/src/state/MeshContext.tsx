@@ -264,6 +264,103 @@ function reducer(state: MeshState, action: MeshAction): MeshState {
         ),
       }
     }
+    case 'apply-cover': {
+      const offer = state.coverOffers.find((o) => o.id === action.offerId)
+      if (!offer || offer.hospitalId !== action.hospitalId) return state
+      const stamp = Date.now()
+      const row = {
+        id: `app-${stamp}`,
+        hospitalId: action.hospitalId,
+        patientId: action.patientId,
+        offerId: action.offerId,
+        nominee: action.nominee,
+        relation: action.relation,
+        declaredCondition: state.patients.find((p) => p.id === action.patientId)?.condition ?? 'On file',
+        status: 'applied' as const,
+        appliedAt: new Date().toLocaleString('en-IN'),
+        note: 'Desk has the application. This is not a claim and not a diagnosis.',
+      }
+      return { ...state, coverApps: [row, ...state.coverApps] }
+    }
+    case 'decide-cover': {
+      const app = state.coverApps.find((a) => a.id === action.applicationId)
+      if (!app) return state
+      if (action.status !== 'issued') {
+        return {
+          ...state,
+          coverApps: state.coverApps.map((a) =>
+            a.id === action.applicationId ? { ...a, status: action.status, note: action.note } : a,
+          ),
+        }
+      }
+      const offer = state.coverOffers.find((o) => o.id === app.offerId)
+      const hospital = state.hospitals.find((h) => h.id === app.hospitalId)
+      if (!offer || !hospital) return state
+      const policyId = `pol-${Date.now()}`
+      const policy = {
+        id: policyId,
+        hospitalId: app.hospitalId,
+        patientId: app.patientId,
+        policyNumber: `MM-${hospital.tokenPrefix}-${String(Date.now()).slice(-5)}`,
+        provider: offer.provider,
+        planName: offer.planName,
+        cashless: offer.cashless,
+        coveragePercent: offer.coveragePercent,
+        sumInsured: offer.sumInsured,
+        premium: offer.premiumYear,
+        validFrom: '30 Sep 2026',
+        validTill: '29 Sep 2027',
+        waitingDays: offer.waitingDays,
+        networkHospital: true,
+      }
+      return {
+        ...state,
+        policies: [policy, ...state.policies],
+        coverApps: state.coverApps.map((a) =>
+          a.id === action.applicationId
+            ? { ...a, status: 'issued', note: action.note, policyId }
+            : a,
+        ),
+      }
+    }
+    case 'request-cashless': {
+      const policy = state.policies.find((p) => p.patientId === action.patientId)
+      if (!policy) return state
+      const existing = state.claims.find((c) => c.patientId === action.patientId && c.status === 'draft')
+      if (existing) {
+        return {
+          ...state,
+          claims: state.claims.map((c) =>
+            c.id === existing.id
+              ? {
+                  ...c,
+                  status: 'pre-auth',
+                  checkNote: 'Cashless asked for today’s visit at this hospital. Desk runs IF–THEN, not a billed claim pack.',
+                }
+              : c,
+          ),
+        }
+      }
+      const visit = state.appointments.find((a) => a.patientId === action.patientId && a.status === 'upcoming')
+      const doctor = state.people.find((p) => p.id === visit?.doctorId)
+      return {
+        ...state,
+        claims: [
+          {
+            id: `cs-${Date.now()}`,
+            hospitalId: policy.hospitalId,
+            patientId: action.patientId,
+            policyId: policy.id,
+            reference: `MM-CS-${String(Date.now()).slice(-4)}`,
+            status: 'pre-auth',
+            visitLabel: visit ? `${visit.dateLabel} · ${visit.time}` : 'Today’s OPD at this hospital',
+            doctorName: doctor?.name ?? 'Duty doctor',
+            checkNote: 'Cashless asked for this visit. Not a diagnosis. Not a claim-rejection agent.',
+          },
+          ...state.claims,
+        ],
+      }
+    }
     default:
       return state
   }

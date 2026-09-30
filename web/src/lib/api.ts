@@ -49,7 +49,9 @@ function jsonFromB64(part: string) {
 
 function apiUrl(path: string) {
   const base = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '')
-  return base ? `${base}${path}` : `/api${path}`
+  if (base) return `${base}${path}`
+  if (import.meta.env.DEV) return `/api${path}`
+  return null
 }
 
 function authHeaders(): HeadersInit {
@@ -57,39 +59,61 @@ function authHeaders(): HeadersInit {
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
 
+function withTimeout(ms: number) {
+  const ctrl = new AbortController()
+  const timer = window.setTimeout(() => ctrl.abort(), ms)
+  return { signal: ctrl.signal, cancel: () => window.clearTimeout(timer) }
+}
+
 export async function loginRemote(role: Role, loginId: string, password: string): Promise<LoginRemoteOk | LoginRemoteFail> {
+  const url = apiUrl('/auth/login')
+  if (!url) return { ok: false, network: true, error: 'API not configured' }
+  const wait = withTimeout(2500)
   try {
-    const res = await fetch(apiUrl('/auth/login'), {
+    const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ role, loginId, password }),
+      body: JSON.stringify({ role, loginId: loginId.trim(), password }),
+      signal: wait.signal,
     })
-    const data = (await res.json().catch(() => ({}))) as {
+    const data = (await res.json().catch(() => null)) as {
       detail?: string | { msg?: string }[]
       access_token?: string
       user?: RemoteUser
-    }
-    if (!res.ok || !data.access_token || !data.user) {
-      const detail = Array.isArray(data.detail) ? data.detail[0]?.msg : data.detail
-      return { ok: false, error: detail || 'Sign-in failed.' }
+    } | null
+    if (!data || typeof data !== 'object' || !data.access_token || !data.user) {
+      const detail = Array.isArray(data?.detail) ? data.detail[0]?.msg : data?.detail
+      return {
+        ok: false,
+        network: res.status !== 401,
+        error: detail || (res.status === 401 ? 'Wrong ID or password.' : 'API unreachable'),
+      }
     }
     return { ok: true, accessToken: data.access_token, user: data.user }
   } catch {
     return { ok: false, network: true, error: 'API unreachable' }
+  } finally {
+    wait.cancel()
   }
 }
 
 export async function fetchFlow(inputs: FlowInputs): Promise<FlowResult> {
+  const url = apiUrl('/analytics/flow')
+  if (!url) return simulateFlow(inputs, 'local')
+  const wait = withTimeout(2500)
   try {
-    const res = await fetch(apiUrl('/analytics/flow'), {
+    const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...authHeaders() },
       body: JSON.stringify(inputs),
+      signal: wait.signal,
     })
     if (!res.ok) throw new Error('analytics down')
     const data = (await res.json()) as FlowResult
     return { ...data, source: 'fastapi' }
   } catch {
     return simulateFlow(inputs, 'local')
+  } finally {
+    wait.cancel()
   }
 }

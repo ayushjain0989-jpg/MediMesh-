@@ -17,16 +17,16 @@ export function ProfilePage() {
   const rows = [
     { to: '/app/database', label: 'AI type & database', icon: '🗄' },
     { to: '/app/health', label: 'Medical Records', icon: '📄' },
-    { to: '/app/health', label: 'Insurance Details', icon: '👜' },
+    { to: '/app/insurance', label: 'Apply for cover', icon: '👜' },
     { to: '/app/profile', label: 'Payment Methods', icon: '💳' },
     { to: '/app/book', label: 'Appointment History', icon: '🕒' },
     { to: '/app/ai', label: 'FAQ & Support', icon: '?' },
   ]
 
   return (
-    <div className="space-y-4 px-5 pt-2">
+    <div className="mx-auto max-w-3xl space-y-4 px-5">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-extrabold">My Profile</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight">My Profile</h1>
         <span className="grid h-9 w-9 place-items-center rounded-full bg-white text-lg card-shadow">⚙</span>
       </div>
       <Card className="flex items-center gap-3">

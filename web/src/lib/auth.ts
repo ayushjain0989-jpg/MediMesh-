@@ -53,7 +53,8 @@ export function authenticate(
   password: string,
 ): { ok: true; person: Person } | { ok: false; error: string } {
   const id = loginId.trim().toUpperCase()
-  if (!id || !password) return { ok: false, error: 'Enter your user ID and password.' }
+  const pass = password.trim()
+  if (!id || !pass) return { ok: false, error: 'Enter your user ID and password.' }
 
   const person = people.find((p) => p.loginId.toUpperCase() === id)
   if (!person) return { ok: false, error: 'Unknown user ID. Check the demo accounts below.' }
@@ -63,6 +64,6 @@ export function authenticate(
       error: `This ID belongs to a ${person.role} account. Switch the tab above.`,
     }
   }
-  if (password !== DEMO_PASSWORD) return { ok: false, error: 'Wrong password. Demo password is mesh123.' }
+  if (pass !== DEMO_PASSWORD) return { ok: false, error: 'Wrong password. Demo password is mesh123.' }
   return { ok: true, person }
 }
