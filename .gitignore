@@ -1,0 +1,26 @@
+# Dependencies and builds
+node_modules/
+web/node_modules/
+web/dist/
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+.env.local
+*.local
+
+# Logs and OS
+*.log
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+.vscode/
+*.suo
+*.sw?
+
+# Python / FastAPI
+.pytest_cache/
+.mypy_cache/

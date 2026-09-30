@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
+  --color-canvas: #eef8f6;
+  --color-ink: #14323a;
+  --color-muted: #6b8490;
+  --color-line: #d7ece8;
+  --color-brand: #1db8a6;
+  --color-brand-dark: #0f766e;
+  --color-mint: #22c55e;
+  --color-amber: #f59e0b;
+  --color-rose: #f43f5e;
+  --color-sky: #0ea5e9;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #cfe8e4;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+.phone-shadow {
+  box-shadow: 0 24px 60px rgb(15 118 110 / 0.16);
+}
+
+.card-shadow {
+  box-shadow: 0 10px 30px rgb(15 118 110 / 0.07);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.portal-bg {
+  background:
+    radial-gradient(circle at 12% 18%, rgb(29 184 166 / 0.16), transparent 28%),
+    radial-gradient(circle at 88% 8%, rgb(14 165 233 / 0.12), transparent 24%),
+    radial-gradient(circle at 70% 90%, rgb(34 197 94 / 0.1), transparent 30%),
+    #f3faf8;
+}
